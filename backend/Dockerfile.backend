@@ -1,0 +1,29 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install python dependencies from requirements.txt
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the entire project
+COPY . .
+
+# Set working directory to backend so imports work correctly
+WORKDIR /app/backend
+
+# Expose the port
+EXPOSE 3001
+
+# Run Gunicorn
+# wsgi:application corresponds to backend/wsgi.py where 'application' is defined
+CMD ["gunicorn", "-b", "0.0.0.0:3001", "wsgi:application"]
