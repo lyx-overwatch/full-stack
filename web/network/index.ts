@@ -30,11 +30,11 @@ async function request<T>(
 
     if (!response.ok) {
       // 尝试解析错误信息，如果解析失败则使用状态文本
-      const errorMessage = await response
+      const errorMessage: any = await response
         .text()
         .catch(() => response.statusText);
 
-      toast.error(`${errorMessage}`);
+      toast.error(`${JSON.parse(errorMessage).msg}`);
 
       return Promise.reject(
         new Error(

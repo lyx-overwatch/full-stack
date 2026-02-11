@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTheme } from 'next-themes';
 import { Moon, Sun } from 'lucide-react';
 import { post } from '@/network';
+import { toast } from 'sonner';
 
 export default function Home() {
   const { setTheme, theme } = useTheme();
@@ -28,13 +29,13 @@ export default function Home() {
     setLoading(true);
     setMessage('');
     try {
-      const resp = await post<{ data: { msg: string } }>('/register', {
+      const resp = await post<{ msg: string }>('/register', {
         email,
         password,
       });
-      setMessage(resp.data.msg || 'Registration failed');
+      toast.success(resp.msg || 'Registration successful!');
     } catch (error) {
-      setMessage('An error occurred');
+      console.log('Registration error:', error);
     } finally {
       setLoading(false);
     }
@@ -44,14 +45,16 @@ export default function Home() {
     setLoading(true);
     setMessage('');
     try {
-      const resp = await post<{ data: { access_token: string } }>('/login', {
-        email,
-        password,
-      });
-      setMessage('Login successful!');
+      const resp = await post<{ data: { access_token: string }; msg: string }>(
+        '/login',
+        {
+          email,
+          password,
+        }
+      );
+      toast.success(resp.msg || 'Login successful!');
       localStorage.setItem('token', resp.data.access_token);
     } catch (error) {
-      setMessage('An error occurred');
       console.error('Login error:', error);
     } finally {
       setLoading(false);
