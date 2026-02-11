@@ -1,4 +1,3 @@
-
 import click
 from api.models import db, User
 
@@ -32,3 +31,20 @@ def setup_commands(app):
     @app.cli.command("insert-test-data")
     def insert_test_data():
         pass
+
+    @app.cli.command("generate-keys")
+    def generate_keys():
+        """
+        Generate RSA keys and print them for .env file
+        """
+        from Crypto.PublicKey import RSA
+        key = RSA.generate(2048)
+        private_key = key.export_key().decode('utf-8')
+        public_key = key.publickey().export_key().decode('utf-8')
+
+        print("\n# Raw RSA Keys:\n")
+        
+        print(f"RSA_PRIVATE_KEY:\n{private_key}\n")
+        print(f"RSA_PUBLIC_KEY:\n{public_key}\n")
+        
+        print("# Note: For .env files, you might need to escape newlines or use base64 if your environment loader doesn't support multiline strings.")

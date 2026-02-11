@@ -17,6 +17,7 @@ import { useTheme } from 'next-themes';
 import { Moon, Sun } from 'lucide-react';
 import { post } from '@/network';
 import { toast } from 'sonner';
+import { RSAEncrypt } from '@/lib/tool';
 
 export default function Home() {
   const { setTheme, theme } = useTheme();
@@ -29,9 +30,10 @@ export default function Home() {
     setLoading(true);
     setMessage('');
     try {
+      const encryptedPassword = await RSAEncrypt(password);
       const resp = await post<{ msg: string }>('/register', {
         email,
-        password,
+        password: encryptedPassword,
       });
       toast.success(resp.msg || 'Registration successful!');
     } catch (error) {
@@ -45,17 +47,18 @@ export default function Home() {
     setLoading(true);
     setMessage('');
     try {
+      const encryptedPassword = await RSAEncrypt(password);
       const resp = await post<{ data: { access_token: string }; msg: string }>(
         '/login',
         {
           email,
-          password,
+          password: encryptedPassword,
         }
       );
       toast.success(resp.msg || 'Login successful!');
       localStorage.setItem('token', resp.data.access_token);
     } catch (error) {
-      console.error('Login error:', error);
+      console.log('Login error:', error);
     } finally {
       setLoading(false);
     }
