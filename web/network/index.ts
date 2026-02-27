@@ -1,5 +1,5 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 import { toast } from 'sonner';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 interface RequestOptions extends RequestInit {
   headers?: Record<string, string>;

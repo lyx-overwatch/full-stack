@@ -53,7 +53,7 @@ jwt = JWTManager(app)
 # add the admin
 setup_admin(app)
 
-# add the admin
+# add the commands
 setup_commands(app)
 
 # Add all endpoints form the API with a "api" prefix
