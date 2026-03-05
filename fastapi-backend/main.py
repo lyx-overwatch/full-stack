@@ -1,18 +1,11 @@
 from fastapi import FastAPI
-import uvicorn
-
+from routes import register_routers
 
 app = FastAPI()
 
+# 注册所有路由
+app = register_routers(app)
 
 @app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-def start():
-    """Launched with `uv run dev` at root level"""
-    uvicorn.run("main:app", host="127.0.0.1", port=8081, reload=True)
-
-if __name__ == "__main__":
-    start()
+async def root():
+    return {"message": "Hello World"}
