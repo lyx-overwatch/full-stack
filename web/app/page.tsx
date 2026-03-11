@@ -48,6 +48,7 @@ export default function Home() {
     setMessage('');
     try {
       const encryptedPassword = await RSAEncrypt(password);
+      console.log('Encrypted Password:', encryptedPassword);
       const resp = await post<{ data: { access_token: string }; msg: string }>(
         '/login',
         {

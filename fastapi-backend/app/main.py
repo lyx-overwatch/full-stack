@@ -31,6 +31,11 @@ async def validation_exception_handler(request, exc):
     logger.error(f"Validation Error: {exc.errors()}")
     return create_api_response(data=exc.errors(), msg="Validation Error", code=422)
 
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    logger.error(f"Global Exception: {str(exc)}")
+    return create_api_response(data=None, msg="Internal Server Error", code=500)    
+
 
 @app.get("/")
 async def root():

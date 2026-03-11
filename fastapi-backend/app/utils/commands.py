@@ -1,50 +1,64 @@
 import click
-from api.models import db, User
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import serialization
+import os
+import base64
 
-"""
-In this file, you can add as many commands as you want using the @app.cli.command decorator
-Flask commands are usefull to run cronjobs or tasks outside of the API but sill in integration 
-with youy database, for example: Import the price of bitcoin every night as 12am
-"""
-def setup_commands(app):
-    
-    """ 
-    This is an example command "insert-test-users" that you can run from the command line
-    by typing: $ flask insert-test-users 5
-    Note: 5 is the number of users to add
+# 注意：在 FastAPI 中你需要根据你的 ORM 配置重新导入正确的 DB session 和 User 模型
+# from app.models.user import User
+# from app.database import get_db
+
+@click.group()
+def cli():
+    """FastAPI 项目的自定义命令行工具"""
+    pass
+
+@cli.command("insert-test-users") # name of our command
+@click.argument("count") # argument of out command
+def insert_test_users(count):
     """
-    @app.cli.command("insert-test-users") # name of our command
-    @click.argument("count") # argument of out command
-    def insert_test_users(count):
-        print("Creating test users")
-        for x in range(1, int(count) + 1):
-            user = User()
-            user.email = "test_user" + str(x) + "@test.com"
-            user.password = "123456"
-            user.is_active = True
-            db.session.add(user)
-            db.session.commit()
-            print("User: ", user.email, " created.")
+    Run from the command line by typing: python app/utils/commands.py insert-test-users 5
+    """
+    print("Creating test users")
+    # 注意：此处需要按 FastAPI 提供数据库连接的方式进行替换 (例如 SQLAlchemy session)
+    # db = next(get_db())
+    for x in range(1, int(count) + 1):
+        # user = User(...)
+        # db.add(user)
+        # db.commit()
+        print(f"User test_user{x}@test.com created.")
 
-        print("All test users created")
+    print("All test users created")
 
-    @app.cli.command("insert-test-data")
-    def insert_test_data():
-        pass
+@cli.command("generate-keys")
+def generate_keys():
+    """
+    Generate RSA keys and print them for .env file
+    """
+    private_key = rsa.generate_private_key(
+        public_exponent=65537,
+        key_size=2048,
+    )
+    
+    private_pem = private_key.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.TraditionalOpenSSL,
+        encryption_algorithm=serialization.NoEncryption()
+    ).decode('utf-8')
 
-    @app.cli.command("generate-keys")
-    def generate_keys():
-        """
-        Generate RSA keys and print them for .env file
-        """
-        from Crypto.PublicKey import RSA
-        key = RSA.generate(2048)
-        private_key = key.export_key().decode('utf-8')
-        public_key = key.publickey().export_key().decode('utf-8')
 
-        print("\n# Raw RSA Keys:\n")
-        
-        print(f"RSA_PRIVATE_KEY:\n{private_key}\n")
-        print(f"RSA_PUBLIC_KEY:\n{public_key}\n")
-        
-        print("# Note: For .env files, you might need to escape newlines or use base64 if your environment loader doesn't support multiline strings.")
+    public_key = private_key.public_key()
+    public_pem = public_key.public_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo
+    ).decode('utf-8')
+
+    with open(".env", "a") as env_file:
+        env_file.write(f"RSA_PRIVATE_KEY='{private_pem.strip()}'\n")
+        env_file.write(f"RSA_PUBLIC_KEY='{public_pem.strip()}'\n")
+
+    print("密钥已编码并保存到 .env 文件")
+    
+
+if __name__ == "__main__":
+    cli()
