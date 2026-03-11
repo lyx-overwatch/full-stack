@@ -4,6 +4,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.utils.index import create_api_response
+from app.utils.logger import setup_logger
+from loguru import logger
+
+setup_logger()
 
 app = FastAPI()
 
@@ -19,10 +23,12 @@ app.add_middleware(
 
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request, exc):
+    logger.error(f"HTTP Exception: {exc.detail}")
     return create_api_response(data=None, msg=str(exc.detail), code=exc.status_code)
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request, exc):
+    logger.error(f"Validation Error: {exc.errors()}")
     return create_api_response(data=exc.errors(), msg="Validation Error", code=422)
 
 
