@@ -5,9 +5,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def create_api_response(data=None, msg="Success", code=200) -> JSONResponse:
+def create_api_response(data=None, msg="Success", code=200, http_status_code: int | None = None) -> JSONResponse:
     content = jsonable_encoder({"code": code, "data": data, "msg": msg})
-    return JSONResponse(status_code=code, content=content)
+    status_code = code if http_status_code is None else http_status_code
+    return JSONResponse(status_code=status_code, content=content)
 
 import os
 import base64

@@ -24,6 +24,17 @@ app.add_middleware(
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request, exc):
     logger.error(f"HTTP Exception: {exc.detail}")
+    if isinstance(exc.detail, dict):
+        detail_code = exc.detail.get("code", exc.status_code)
+        detail_msg = exc.detail.get("msg", "HTTP Exception")
+        detail_data = exc.detail.get("data")
+        return create_api_response(
+            data=detail_data,
+            msg=str(detail_msg),
+            code=detail_code,
+            http_status_code=exc.status_code,
+        )
+
     return create_api_response(data=None, msg=str(exc.detail), code=exc.status_code)
 
 @app.exception_handler(RequestValidationError)
