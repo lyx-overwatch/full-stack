@@ -1,4 +1,4 @@
-from models.User import User
+from app.models.user import User
 from sqlmodel import Session, select
 from passlib.context import CryptContext
 

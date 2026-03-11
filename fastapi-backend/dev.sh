@@ -1,2 +1,2 @@
 #!/bin/bash
-uv run fastapi dev main.py --port 8081
+uv run fastapi dev app/main.py --port 8081

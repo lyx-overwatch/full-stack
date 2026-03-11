@@ -16,6 +16,6 @@ dependencies = [
 ]
 
 [tool.setuptools]
-packages = ["database", "models", "routes", "controllers", "utils"]
+packages = ["app"]
 
 [project.scripts]

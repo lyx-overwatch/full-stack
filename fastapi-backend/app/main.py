@@ -1,9 +1,9 @@
 from fastapi import FastAPI
-from routes import register_routers
+from app.routes import register_routers
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
-from utils.index import create_api_response
+from app.utils.index import create_api_response
 
 app = FastAPI()
 

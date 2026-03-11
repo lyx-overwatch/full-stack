@@ -2,10 +2,9 @@ from fastapi import APIRouter, Depends
 from typing import Annotated
 from pydantic import BaseModel
 from sqlmodel import Session
-from utils.index import create_api_response, decrypt_password
-from controllers.login import register_controller, login_controller
-
-from database import get_session
+from app.utils.index import create_api_response, decrypt_password
+from app.controllers.login import register_controller, login_controller
+from app.database import get_session
 
 router = APIRouter()
 

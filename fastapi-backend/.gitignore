@@ -9,6 +9,6 @@ __pycache__/
 
 .venv
 
-migrations/
+migrations/versions/
 
 *.egg-info
