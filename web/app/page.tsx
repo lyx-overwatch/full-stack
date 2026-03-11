@@ -18,8 +18,10 @@ import { Moon, Sun } from 'lucide-react';
 import { post } from '@/network';
 import { toast } from 'sonner';
 import { RSAEncrypt } from '@/lib/tool';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
+  const router = useRouter();
   const { setTheme, theme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,10 +33,16 @@ export default function Home() {
     setMessage('');
     try {
       const encryptedPassword = await RSAEncrypt(password);
-      const resp = await post<{ msg: string }>('/register', {
-        email,
-        password: encryptedPassword,
-      });
+      const resp = await post<{ msg: string }>(
+        '/register',
+        {
+          email,
+          password: encryptedPassword,
+        },
+        {
+          withAuth: false,
+        },
+      );
       toast.success(resp.msg || 'Registration successful!');
     } catch (error) {
       console.log('Registration error:', error);
@@ -48,16 +56,30 @@ export default function Home() {
     setMessage('');
     try {
       const encryptedPassword = await RSAEncrypt(password);
-      console.log('Encrypted Password:', encryptedPassword);
-      const resp = await post<{ data: { access_token: string }; msg: string }>(
+      const resp = await post<{
+        data: { access_token: string; refresh_token: string; email: string };
+        msg: string;
+      }>(
         '/login',
         {
           email,
           password: encryptedPassword,
-        }
+        },
+        {
+          withAuth: false,
+        },
       );
       toast.success(resp.msg || 'Login successful!');
-      localStorage.setItem('token', resp.data.access_token);
+      const token = resp.data.access_token;
+      const refreshToken = resp.data.refresh_token;
+      const emailData = resp.data.email;
+      const profile = {
+        email: emailData,
+      };
+      localStorage.setItem('token', token);
+      localStorage.setItem('refresh_token', refreshToken);
+      localStorage.setItem('profile', JSON.stringify(profile));
+      router.push('/chat');
     } catch (error) {
       console.log('Login error:', error);
     } finally {
@@ -132,9 +154,7 @@ export default function Home() {
           <Card>
             <CardHeader>
               <CardTitle>Register</CardTitle>
-              <CardDescription>
-                Create a new account here. Click register when you're done.
-              </CardDescription>
+              <CardDescription>Create a new account here.</CardDescription>
             </CardHeader>
             <CardContent className='space-y-2'>
               <div className='space-y-1'>

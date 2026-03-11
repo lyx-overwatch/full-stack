@@ -11,6 +11,5 @@ export const RSAEncrypt = async (password: string): Promise<string> => {
     '\n'
   );
   jsencrypt.setKey(replacedKey);
-  console.log('Public Key:', replacedKey);
   return jsencrypt.encrypt(password) || '';
 };
