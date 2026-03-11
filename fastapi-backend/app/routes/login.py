@@ -3,20 +3,21 @@ from typing import Annotated
 from pydantic import BaseModel
 from sqlmodel import Session
 from app.utils.index import create_api_response, decrypt_password
+from app.utils.auth import create_access_token
 from app.controllers.login import register_controller, login_controller
 from app.database import get_session
 from loguru import logger
 
 router = APIRouter()
 
+SessionDep = Annotated[Session, Depends(get_session)]
+
 class UserCredentials(BaseModel):
     email: str
     password: str
 
-SessionDep = Annotated[Session, Depends(get_session)]
-
 @router.post("/register")
-async def register(credentials: UserCredentials, session: SessionDep):  
+async def register(credentials: UserCredentials, session: SessionDep):
 
     email = credentials.email
     password_input = credentials.password
@@ -60,4 +61,13 @@ async def login(credentials: UserCredentials, session: SessionDep):
     if not result:
         return create_api_response(msg="Invalid email or password", code=500)
 
-    return create_api_response(msg="Login successful")
+    access_token = create_access_token({"sub": result.email, "uid": result.id})
+    return create_api_response(
+        data={
+            "access_token": access_token,
+            "token_type": "bearer",
+            "email": result.email,
+            "uuid": result.id,
+        },
+        msg="Login successful",
+    )

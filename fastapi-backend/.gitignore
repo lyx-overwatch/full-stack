@@ -1,6 +1,4 @@
 
-# env files (can opt-in for committing if needed)
-
 /logs
 
 __pycache__/
@@ -12,3 +10,7 @@ __pycache__/
 migrations/versions/
 
 *.egg-info
+
+.env
+
+alembic.ini
