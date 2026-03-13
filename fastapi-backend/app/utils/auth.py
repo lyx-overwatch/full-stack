@@ -48,7 +48,7 @@ def hash_token(token: str) -> str:
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
 
-def verify_token(token: str, expected_token_type: str):
+def verify_token(token: str, expected_token_type: str) -> tuple:
     try:
         payload = jwt.decode(token, os.getenv("SECRET_KEY"), algorithms=["HS256"])
         token_type = payload.get("token_type")

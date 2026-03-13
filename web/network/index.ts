@@ -1,4 +1,3 @@
-import { refresh } from 'next/cache';
 import { toast } from 'sonner';
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
@@ -14,28 +13,18 @@ interface RequestOptions extends RequestInit {
 }
 
 const getAccessToken = () => {
-  if (typeof window === 'undefined') {
-    return '';
-  }
   return localStorage.getItem('token') || '';
 };
 
 const getRefreshToken = () => {
-  if (typeof window === 'undefined') {
-    return '';
-  }
   return localStorage.getItem('refresh_token') || '';
 };
 
 const clearTokenAndRedirectToLogin = (
-  message = '登录状态已失效，请重新登录',
+  message = '登录状态已失效，请重新登录'
 ) => {
-  if (typeof window === 'undefined') {
-    return;
-  }
-
   localStorage.removeItem('token');
-  localStorage.removeItem('refresh_token'); 
+  localStorage.removeItem('refresh_token');
   toast.error(message);
 
   // if (window.location.pathname !== '/') {
@@ -81,10 +70,6 @@ const extractAccessToken = (payload: unknown) => {
 let refreshPromise: Promise<string | null> | null = null;
 
 const refreshAccessToken = async (refreshToken: string) => {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-
   if (refreshPromise) {
     return refreshPromise;
   }
@@ -120,7 +105,7 @@ const refreshAccessToken = async (refreshToken: string) => {
 // 通用请求函数
 async function request<T>(
   endpoint: string,
-  options: RequestOptions = {},
+  options: RequestOptions = {}
 ): Promise<T> {
   const {
     headers,
@@ -155,7 +140,7 @@ async function request<T>(
 
       const { code: errorCode, message: errorMessage } = parseErrorPayload(
         errorText,
-        response.statusText,
+        response.statusText
       );
 
       if (response.status === 401) {
@@ -185,8 +170,10 @@ async function request<T>(
 
         return Promise.reject(
           new Error(
-            `HTTP error! status: ${response.status}, code: ${String(errorCode)}, message: ${errorMessage}`,
-          ),
+            `HTTP error! status: ${response.status}, code: ${String(
+              errorCode
+            )}, message: ${errorMessage}`
+          )
         );
       }
 
@@ -194,8 +181,8 @@ async function request<T>(
 
       return Promise.reject(
         new Error(
-          `HTTP error! status: ${response.status}, message: ${errorMessage}`,
-        ),
+          `HTTP error! status: ${response.status}, message: ${errorMessage}`
+        )
       );
     }
 
@@ -220,7 +207,7 @@ export const get = <T>(endpoint: string, options?: RequestOptions) => {
 export const post = <T>(
   endpoint: string,
   body: unknown,
-  options?: RequestOptions,
+  options?: RequestOptions
 ) => {
   return request<T>(endpoint, {
     method: 'POST',
@@ -233,7 +220,7 @@ export const post = <T>(
 export const put = <T>(
   endpoint: string,
   body: unknown,
-  options?: RequestOptions,
+  options?: RequestOptions
 ) => {
   return request<T>(endpoint, {
     method: 'PUT',
@@ -251,7 +238,7 @@ export const del = <T>(endpoint: string, options?: RequestOptions) => {
 export const patch = <T>(
   endpoint: string,
   body: unknown,
-  options?: RequestOptions,
+  options?: RequestOptions
 ) => {
   return request<T>(endpoint, {
     method: 'PATCH',

@@ -41,7 +41,7 @@ export default function Home() {
         },
         {
           withAuth: false,
-        },
+        }
       );
       toast.success(resp.msg || 'Registration successful!');
     } catch (error) {
@@ -67,7 +67,7 @@ export default function Home() {
         },
         {
           withAuth: false,
-        },
+        }
       );
       toast.success(resp.msg || 'Login successful!');
       const token = resp.data.access_token;
